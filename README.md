@@ -7,5 +7,7 @@
 	- Hugo Adrian Fernandez Loya
 ## URL Repo
 - https://github.com/Bran2Joestar/ITCC---Programacion-Logica-y-Funcional.git
-## URL Figma ó capturas/imágenes (Pendiente)
-- API: https://spapi.dev/
+## URL Figma ó capturas/imágenes 
+- (Pendiente)
+## API: 
+- https://spapi.dev/
