@@ -1,15 +1,14 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import Vue from 'vue';
+import { createApp } from 'vue';
+import App from './App.vue';
 import axios from 'axios';
 import VueCookies from 'vue-cookies';
-import router from './app.routing';
+import router from './app/app.routing';
 
-new Vue({
-  render: h => h(App),
-  router
-}).$mount('#app');
-Vue.use(VueCookies);
-Vue.prototype.$http = axios;
-createApp(App).mount('#app')
-//  wasas
+const app = createApp(App); // Crea la aplicación
+
+// Configura plugins
+app.use(VueCookies);
+app.config.globalProperties.$http = axios; // Usa axios como propiedad global
+
+app.use(router); // Usa el router
+app.mount('#app'); // Monta la aplicación

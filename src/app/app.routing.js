@@ -1,6 +1,17 @@
-import router from './app.routing';
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeComponent from './modules/home/home.component.vue';
 
-new Vue({
-  render: h => h(App),
-  router
-}).$mount('#app');
+const routes = [
+    {
+        path: '/',
+        name: 'Home',
+        component: HomeComponent,
+    },
+];
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+});
+
+export default router;
