@@ -10,19 +10,24 @@
         <li><router-link to="/character/11">Eric Cartman</router-link></li>
         <li><router-link to="/character/42">Kenny McCormick</router-link></li>
       </ul>
+      <ThemeToggle />
     </nav>
   </header>
 </template>
 
 <script>
+import ThemeToggle from '@/components/ThemeToggle.vue';
+
 export default {
-  name: 'HeaderComponent'
+  name: 'HeaderComponent', // Cambiado a HeaderComponent
+  components: {
+    ThemeToggle,
+  },
 }
 </script>
 
 <style scoped>
 header {
-  background-color: #f8f9fa;
   padding: 10px;
 }
 
@@ -48,7 +53,6 @@ header {
 }
 
 .nav-links li a {
-  color: #333;
   text-decoration: none;
   font-weight: 500;
 }

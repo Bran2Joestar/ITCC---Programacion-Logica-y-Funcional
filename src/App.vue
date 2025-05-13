@@ -20,4 +20,13 @@ export default {
 
 <style>
 /* Estilos globales aquí */
+body {
+  background-color: white;
+  color: black;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: white;
+}
 </style>
