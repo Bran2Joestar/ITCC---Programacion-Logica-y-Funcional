@@ -1,16 +1,23 @@
 <template>
   <div id="app">
-    <Home />
+    <header>
+      <nav>
+        <router-link to="/">Inicio</router-link>
+        <router-link to="/character/1">Personaje 1</router-link>
+      </nav>
+    </header>
+    <main>
+      <router-view /> <!-- Aquí se renderizan los componentes según la ruta -->
+    </main>
   </div>
 </template>
 
 <script>
-import Home from './app/modules/home/home.component.vue';
-
 export default {
   name: 'App',
-  components: {
-    Home
-  }
-}
+};
 </script>
+
+<style>
+/* Estilos globales aquí */
+</style>

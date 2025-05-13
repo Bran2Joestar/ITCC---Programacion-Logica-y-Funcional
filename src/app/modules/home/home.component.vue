@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Página de Inicio</h2>
+    <h2>Api de SouthPark</h2>
     <Header />
   </div>
 </template>

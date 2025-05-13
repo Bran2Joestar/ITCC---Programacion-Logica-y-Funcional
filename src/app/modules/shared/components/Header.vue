@@ -1,6 +1,6 @@
 <template>
   <header>
-    <h1>Mi Aplicación</h1>
+    <h1>SouthPark</h1>
   </header>
 </template>
 
