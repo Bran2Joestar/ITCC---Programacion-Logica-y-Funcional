@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <header>
-      <nav>
-        <router-link to="/">Inicio</router-link>
-        <router-link to="/character/1">Personaje 1</router-link>
-      </nav>
-    </header>
+    <HeaderComponent />
     <main>
-      <router-view /> <!-- Aquí se renderizan los componentes según la ruta -->
+      <router-view />
     </main>
   </div>
 </template>
 
 <script>
+import HeaderComponent from './app/modules/shared/components/Header.vue'
+
 export default {
   name: 'App',
+  components: {
+    HeaderComponent
+  }
 };
 </script>
 
