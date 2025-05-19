@@ -10,7 +10,7 @@
       <p><strong>Color de cabello:</strong> {{ character.hair_color || '?' }}</p>
       <p><strong>Ocupación:</strong> {{ character.occupation || '?' }}</p>
       <p><strong>Religión:</strong> {{ character.religion || '?' }}</p>
-      <p><strong>Familia:</strong>
+      <p><strong>Familia: </strong>
         <router-link v-if="familyData" :to="`/family/${getIdFromUrl(character.family)}`">
           {{ familyData.name }}
         </router-link>
@@ -189,7 +189,19 @@ body.dark-mode h3 {
   margin-bottom: 5px;
 }
 
-.router-link-active {
+/* Enlaces color azul verdoso */
+.character-details a,
+.character-details .router-link-active,
+.character-details .router-link-exact-active {
+  color: #008080; /* Azul verdoso */
   font-weight: bold;
+  text-decoration: none;
+}
+
+.character-details a:hover,
+.character-details .router-link-active:hover,
+.character-details .router-link-exact-active:hover {
+  color: #20b2aa; /* Azul verdoso más claro */
+  text-decoration: underline;
 }
 </style>
