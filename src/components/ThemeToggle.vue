@@ -43,10 +43,10 @@ export default {
     // Aplicar fondo correcto al cargar
     if (this.isDarkMode) {
       document.body.style.backgroundImage =
-        "url('https://preview.redd.it/my-folder-of-south-park-wallpapers-v0-m5khy5lspaaa1.jpg?width=1080&crop=smart&auto=webp&s=2382f9277b979acad2b20f9da08df2c4e5e911aa')";
+        "url('url('https://4kwallpapers.com/images/walls/thumbs_3t/9376.jpg')";
     } else {
       document.body.style.backgroundImage =
-        "url('https://c4.wallpaperflare.com/wallpaper/1/170/481/south-park-the-stick-of-truth-south-park-wallpaper-preview.jpg')";
+        "url('https://4kwallpapers.com/images/walls/thumbs_3t/9380.jpg')";
     }
 
     document.body.style.backgroundSize = 'cover';
