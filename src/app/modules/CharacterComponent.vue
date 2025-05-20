@@ -150,7 +150,7 @@ export default {
 body.dark-mode .character-details {
   background-color: rgba(0, 0, 0, 0.75);
   color: #fff;
-  border-color: #fff;
+  border-color: #030303;
 }
 
 h1, h2, h3 {
@@ -161,7 +161,7 @@ h1, h2, h3 {
 body.dark-mode h1,
 body.dark-mode h2,
 body.dark-mode h3 {
-  color: #ffcc00;
+  color: #fd9e32;
 }
 
 .loading {

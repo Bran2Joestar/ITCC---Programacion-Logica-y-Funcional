@@ -120,7 +120,7 @@ export default {
 .card.dark {
   background-color: rgba(0, 0, 0, 0.85);
   color: #eee;
-  border-color: #ccc;
+  border-color: #000000;
 }
 
 .character-list {
@@ -151,7 +151,7 @@ a:hover {
 
 h1, h2, h3 {
   color: #1a1a1a;
-  text-shadow: 1px 1px 0 #fff;
+  text-shadow: 1px 1px 0 #000000;
 }
 
 .card.dark h1,
