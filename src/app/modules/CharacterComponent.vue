@@ -4,6 +4,12 @@
     <div v-if="loading" class="loading">Cargando...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else class="card">
+       <img
+     v-if="character.name"
+  :src="getCharacterImage(character.name)"
+  alt="Imagen del personaje"
+  class="character-image"
+  />
       <h2>{{ character.name }}</h2>
       <p><strong>Edad:</strong> {{ character.age || '?' }}</p>
       <p><strong>Sexo:</strong> {{ character.sex || '?' }}</p>
@@ -128,7 +134,16 @@ export default {
     getIdFromUrl(url) {
       if (!url) return '';
       return url.split('/').filter(Boolean).pop();
-    }
+    },
+    getCharacterImage(name) {
+    const images = {
+    "Stan Marsh": "/img/stan-marsh.png",
+    "Kyle Broflovski": "/img/kyle-broflovski.png",
+    "Eric Cartman": "/img/eric-cartman.png",
+    "Kenny McCormick": "/img/kenny-mccormick.png"
+    };
+    return images[name] || '/img/default.jpg';
+  },
   },
 };
 </script>
@@ -145,6 +160,14 @@ export default {
   font-family: 'Patrick Hand', cursive;
   color: #333;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.character-image {
+  display: block;
+  margin: 0 auto 15px;
+  border-radius: 10px;
+  max-width: 200px;
+  height: auto;
 }
 
 body.dark-mode .character-details {
