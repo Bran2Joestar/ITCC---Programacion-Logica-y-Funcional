@@ -10,22 +10,39 @@
         <li><router-link to="/character/3">Kyle Broflovski</router-link></li>
         <li><router-link to="/character/11">Eric Cartman</router-link></li>
         <li><router-link to="/character/42">Kenny McCormick</router-link></li>
+        <li> <button @click="cambiarModo">🌙</button></li>
       </ul>
-      <ThemeToggle />
+
     </nav>
+
   </header>
 </template>
 
 <script>
-import ThemeToggle from '@/components/ThemeToggle.vue';
+import { toggleDarkMode, aplicarModoOscuro } from '@/app/core/storage/darkmode.js';
 
 export default {
-  name: 'HeaderComponent',
-  components: {
-    ThemeToggle,
+  name: 'AppHeader',
+  methods: {
+    cambiarModo() {
+      toggleDarkMode();
+    }
   },
-}
+  mounted() {
+    aplicarModoOscuro(); // Aplica el fondo correcto al cargar
+  }
+};
 </script>
+
+<style scoped>
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+</style>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
@@ -85,5 +102,11 @@ header {
   padding: 4px 6px;
   border-radius: 5px;
   color: #000;
+}
+</style>
+<style>
+.dark-mode {
+  background-color: #121212;
+  color: white;
 }
 </style>
