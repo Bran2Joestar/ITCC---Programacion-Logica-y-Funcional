@@ -66,14 +66,21 @@ export default {
     '$route.params.id': 'fetchCharacterData'
   },
   methods: {
+    async delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
+    
     async fetchCharacter() {
       const characterId = this.$route.params.id;
+      await this.delay(500); // Delay de 500 ms
       const response = await axios.get(`https://spapi.dev/api/characters/${characterId}`);
       if (response.status !== 200) throw new Error('Error en la red');
       return response.data.data;
     },
+    
     async fetchFamily(url) {
       if (!url) return null;
+      await this.delay(500); // Delay de 500 ms
       try {
         const response = await axios.get(url);
         if (response.status !== 200) throw new Error('Error en la red');
@@ -82,6 +89,7 @@ export default {
         return null;
       }
     },
+    
     async fetchCharacterData() {
       this.loading = true;
       this.error = null;
@@ -96,6 +104,7 @@ export default {
 
         if (character.relatives && character.relatives.length > 0) {
           const relativesPromises = character.relatives.map(async (rel) => {
+            await this.delay(500); // Delay de 500 ms
             try {
               const res = await axios.get(rel.url);
               return {
@@ -131,19 +140,21 @@ export default {
         this.loading = false;
       }
     },
+    
     getIdFromUrl(url) {
       if (!url) return '';
       return url.split('/').filter(Boolean).pop();
     },
+    
     getCharacterImage(name) {
-    const images = {
-    "Stan Marsh": "/img/stan-marsh.png",
-    "Kyle Broflovski": "/img/kyle-broflovski.png",
-    "Eric Cartman": "/img/eric-cartman.png",
-    "Kenny McCormick": "/img/kenny-mccormick.png"
-    };
-    return images[name] || '/img/default.jpg';
-  },
+      const images = {
+        "Stan Marsh": "/img/stan-marsh.png",
+        "Kyle Broflovski": "/img/kyle-broflovski.png",
+        "Eric Cartman": "/img/eric-cartman.png",
+        "Kenny McCormick": "/img/kenny-mccormick.png"
+      };
+      return images[name] || '/img/default.jpg';
+    },
   },
 };
 </script>
