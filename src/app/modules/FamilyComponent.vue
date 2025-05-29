@@ -52,6 +52,10 @@ export default {
     async fetchFamilyData() {
       this.loading = true;
       this.error = null;
+
+      // Delay antes de hacer las consultas
+      await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms de delay
+
       try {
         const family = await this.fetchFamily();
         this.family = family;
