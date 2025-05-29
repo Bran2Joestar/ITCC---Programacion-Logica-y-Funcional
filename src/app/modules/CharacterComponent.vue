@@ -1,30 +1,43 @@
 <template>
-  <div class="character-container">
-    <h1>{{ character.name }}</h1>
-    <img :src="getCharacterImage(character.name)" :alt="character.name" />
+  <div class="character-details">
+    <h1>Detalles del Personaje</h1>
+    <div v-if="loading" class="loading">Cargando...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else class="card">
+       <img
+     v-if="character.name"
+  :src="getCharacterImage(character.name)"
+  alt="Imagen del personaje"
+  class="character-image"
+  />
+      <h2>{{ character.name }}</h2>
+      <p><strong>Edad:</strong> {{ character.age || '?' }}</p>
+      <p><strong>Sexo:</strong> {{ character.sex || '?' }}</p>
+      <p><strong>Color de cabello:</strong> {{ character.hair_color || '?' }}</p>
+      <p><strong>Ocupación:</strong> {{ character.occupation || '?' }}</p>
+      <p><strong>Religión:</strong> {{ character.religion || '?' }}</p>
+      <p><strong>Familia: </strong>
+        <router-link v-if="familyData" :to="`/family/${getIdFromUrl(character.family)}`">
+          {{ familyData.name }}
+        </router-link>
+        <span v-else>Cargando...</span>
+      </p>
 
-    <div v-if="familyData">
-      <h2>Familia: {{ familyData.name }}</h2>
-    </div>
-
-    <div v-if="relatives.length">
-      <h3>Relaciones Familiares:</h3>
+      <h3>Relaciones de Familia</h3>
       <ul>
-        <li v-for="relative in relatives" :key="relative.url">
+        <li v-for="relative in relativesData" :key="relative.url">
           {{ relative.relation }}:
           <router-link :to="`/character/${getIdFromUrl(relative.url)}`">
-            {{ relative.name }}
+            {{ relative.name || 'Cargando...' }}
           </router-link>
         </li>
       </ul>
-    </div>
 
-    <div v-if="episodes.length">
-      <h3>Episodios:</h3>
-      <ul>
-        <li v-for="episode in episodes" :key="episode.url">
+      <h3>Episodios</h3>
+      <ul class="episode-list">
+        <li v-for="episode in episodesData" :key="episode.url">
           <router-link :to="`/episode/${getIdFromUrl(episode.url)}`">
-            #{{ getIdFromUrl(episode.url) }}
+            #{{ episode.id || '...' }}
           </router-link>
         </li>
       </ul>
@@ -33,88 +46,185 @@
 </template>
 
 <script>
-import { fetchCharacterById, fetchByUrl } from '../services/apiServices';
+import axios from 'axios';
 
 export default {
   data() {
     return {
       character: {},
+      relativesData: [],
+      episodesData: [],
       familyData: null,
-      relatives: [],
-      episodes: [],
+      loading: true,
+      error: null,
     };
   },
-  async created() {
-    try {
-      const id = this.$route.params.id;
-      const character = await fetchCharacterById(id);
-      this.character = character;
-
-      // Cargar familia
-      if (character.family) {
-        this.familyData = await fetchByUrl(character.family);
-      }
-
-      // Cargar relaciones familiares
-      if (character.relatives && character.relatives.length > 0) {
-        const relativesData = await Promise.all(
-          character.relatives.map(async (rel) => {
-            const data = await fetchByUrl(rel.url);
-            return {
-              relation: rel.relation,
-              name: data.name || 'Sin nombre',
-              url: rel.url,
-            };
-          })
-        );
-        this.relatives = relativesData;
-      }
-
-      // Cargar episodios
-      if (character.episodes && character.episodes.length > 0) {
-        const episodesData = await Promise.all(
-          character.episodes.map(async (url) => {
-            const data = await fetchByUrl(url);
-            return {
-              ...data,
-              url,
-            };
-          })
-        );
-        this.episodes = episodesData;
-      }
-    } catch (error) {
-      console.error('Error al cargar los datos del personaje:', error);
-    }
+  created() {
+    this.fetchCharacterData();
+  },
+  watch: {
+    '$route.params.id': 'fetchCharacterData'
   },
   methods: {
-    getCharacterImage(name) {
-      const images = {
-        "Stan Marsh": "/img/stan-marsh.png",
-        "Kyle Broflovski": "/img/kyle-broflovski.png",
-        "Eric Cartman": "/img/eric-cartman.png",
-        "Kenny McCormick": "/img/kenny-mccormick.png"
-      };
-      return images[name] || '/img/default.jpg';
+    async fetchCharacter() {
+      const characterId = this.$route.params.id;
+      const response = await axios.get(`https://spapi.dev/api/characters/${characterId}`);
+      if (response.status !== 200) throw new Error('Error en la red');
+      return response.data.data;
+    },
+    async fetchFamily(url) {
+      if (!url) return null;
+      try {
+        const response = await axios.get(url);
+        if (response.status !== 200) throw new Error('Error en la red');
+        return response.data.data;
+      } catch {
+        return null;
+      }
+    },
+    async fetchCharacterData() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const character = await this.fetchCharacter();
+        this.character = character;
+
+        this.familyData = null;
+        if (character.family) {
+          this.familyData = await this.fetchFamily(character.family);
+        }
+
+        if (character.relatives && character.relatives.length > 0) {
+          const relativesPromises = character.relatives.map(async (rel) => {
+            try {
+              const res = await axios.get(rel.url);
+              return {
+                relation: rel.relation,
+                url: rel.url,
+                name: res.data.data.name || 'Sin nombre',
+              };
+            } catch {
+              return {
+                relation: rel.relation,
+                url: rel.url,
+                name: 'Error cargando',
+              };
+            }
+          });
+          this.relativesData = await Promise.all(relativesPromises);
+        } else {
+          this.relativesData = [];
+        }
+
+        if (character.episodes && character.episodes.length > 0) {
+          this.episodesData = character.episodes.map(url => ({
+            url,
+            id: this.getIdFromUrl(url)
+          }));
+        } else {
+          this.episodesData = [];
+        }
+
+      } catch (e) {
+        this.error = 'Error al cargar los datos del personaje';
+      } finally {
+        this.loading = false;
+      }
     },
     getIdFromUrl(url) {
-      return url?.split('/').filter(Boolean).pop();
-    }
-  }
+      if (!url) return '';
+      return url.split('/').filter(Boolean).pop();
+    },
+    getCharacterImage(name) {
+    const images = {
+    "Stan Marsh": "/img/stan-marsh.png",
+    "Kyle Broflovski": "/img/kyle-broflovski.png",
+    "Eric Cartman": "/img/eric-cartman.png",
+    "Kenny McCormick": "/img/kenny-mccormick.png"
+    };
+    return images[name] || '/img/default.jpg';
+  },
+  },
 };
 </script>
 
-<style scoped>
-.character-container {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
+<style>
+.character-details {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 2px solid #333;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  font-family: 'Patrick Hand', cursive;
+  color: #333;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.character-container img {
-  max-width: 300px;
+.character-image {
+  display: block;
+  margin: 0 auto 15px;
+  border-radius: 10px;
+  max-width: 200px;
   height: auto;
-  border-radius: 12px;
-  margin: 20px 0;
+}
+
+body.dark-mode .character-details {
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  border-color: #030303;
+}
+
+h1, h2, h3 {
+  text-align: center;
+  color: #222;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+  color: #fd9e32;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 20px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+}
+
+.card p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.card ul {
+  padding-left: 20px;
+}
+
+.episode-list li {
+  margin-bottom: 5px;
+}
+
+/* Enlaces color azul verdoso */
+.character-details a,
+.character-details .router-link-active,
+.character-details .router-link-exact-active {
+  color: #008080; /* Azul verdoso */
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.character-details a:hover,
+.character-details .router-link-active:hover,
+.character-details .router-link-exact-active:hover {
+  color: #20b2aa; /* Azul verdoso más claro */
+  text-decoration: underline;
 }
 </style>
