@@ -153,7 +153,7 @@ export default {
         "Eric Cartman": "/img/eric-cartman.png",
         "Kenny McCormick": "/img/kenny-mccormick.png"
       };
-      return images[name] || '/img/default.jpg';
+      return images[name] || '/img/default.png';
     },
   },
 };
