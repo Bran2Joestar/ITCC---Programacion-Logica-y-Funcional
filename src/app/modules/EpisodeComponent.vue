@@ -3,7 +3,7 @@
     <h1>Detalles del Episodio</h1>
     <div v-if="loading" class="loading">Cargando...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div class="card" :class="{ dark: isDarkMode }">
+    <div class="card" :class="{ dark: isDarkMode }" v-else>
       <h2>{{ episode.name }}</h2>
       <p><strong>Temporada:</strong> {{ episode.season }}</p>
       <p><strong>Episodio:</strong> {{ episode.episode }}</p>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { fetchEpisodeById, fetchByUrl } from '../services/apiServices';
 
 export default {
   data() {
@@ -47,46 +47,25 @@ export default {
     '$route.params.id': 'fetchEpisodeData',
   },
   methods: {
-    async fetchEpisode() {
-      const episodeId = this.$route.params.id;
-      const response = await axios.get(`https://spapi.dev/api/episodes/${episodeId}`);
-      if (response.status !== 200) throw new Error('Error en la red');
-      return response.data.data;
-    },
     async fetchEpisodeData() {
       this.loading = true;
       this.error = null;
       try {
-        const episode = await this.fetchEpisode();
+        const episode = await fetchEpisodeById(this.$route.params.id);
         this.episode = episode;
-
-        if (episode.characters && episode.characters.length > 0) {
-          const charsPromises = episode.characters.map(async (url) => {
-            try {
-              const res = await axios.get(url);
-              return {
-                url,
-                name: res.data.data.name || 'Sin nombre',
-              };
-            } catch {
-              return {
-                url,
-                name: 'Error cargando',
-              };
-            }
-          });
-          this.charactersData = await Promise.all(charsPromises);
-        } else {
-          this.charactersData = [];
-        }
-      } catch (e) {
+        this.charactersData = await Promise.all(
+          (episode.characters || []).map(url =>
+            fetchByUrl(url).catch(() => ({ url, name: 'Error cargando' }))
+          )
+        );
+      } catch (err) {
         this.error = 'Error al cargar los datos del episodio';
+        console.error(err);
       } finally {
         this.loading = false;
       }
     },
     getIdFromUrl(url) {
-      if (!url) return '';
       return url.split('/').filter(Boolean).pop();
     },
     detectDarkMode() {
@@ -98,84 +77,17 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
-
-.episode-details {
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: 'Patrick Hand', 'Comic Sans MS', cursive;
-  padding: 20px;
-  color: #222;
-}
-
-.card {
-  background-color: rgba(255, 255, 255, 0.85);
-  border: 4px solid #333;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.4);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Estilo para modo oscuro activado */
-.card.dark {
-  background-color: rgba(0, 0, 0, 0.85);
-  color: white;
-  border-color: #fff;
-}
-
-.thumbnail {
-  max-width: 100%;
-  border-radius: 10px;
-  margin: 15px 0;
-}
-
-.character-list {
-  list-style-type: '👤 ';
-  padding-left: 30px;
-}
-
-.character-list li {
-  margin-bottom: 8px;
-}
-
-a {
-  color: #d82c20;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-  background-color: #ffdab9;
-  padding: 2px 4px;
-  border-radius: 4px;
-}
-
-/* En modo oscuro */
-.card.dark a {
-  color: #fca311;
-}
-
-h1, h2, h3 {
-  color: #1a1a1a;
-  text-shadow: 1px 1px 0 #fff;
-}
-
-.card.dark h1,
-.card.dark h2,
-.card.dark h3 {
-  color: #f9f9f9;
-  text-shadow: none;
-}
-
-.loading {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: #888;
-}
-
-.error {
-  color: red;
-  font-weight: bold;
-}
+.episode-details { max-width: 800px; margin: 0 auto; font-family: 'Patrick Hand', cursive; padding: 20px; color: #222; }
+.card { background-color: rgba(255, 255, 255, 0.85); border: 4px solid #333; border-radius: 20px; padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.4); transition: background-color 0.3s ease, color 0.3s ease; }
+.card.dark { background-color: rgba(0, 0, 0, 0.85); color: white; border-color: #fff; }
+.thumbnail { max-width: 100%; border-radius: 10px; margin: 15px 0; }
+.character-list { list-style-type: '👤 '; padding-left: 30px; }
+.character-list li { margin-bottom: 8px; }
+a { color: #d82c20; font-weight: bold; text-decoration: none; }
+a:hover { text-decoration: underline; background-color: #ffdab9; padding: 2px 4px; border-radius: 4px; }
+.card.dark a { color: #fca311; }
+h1, h2, h3 { color: #1a1a1a; text-shadow: 1px 1px 0 #fff; }
+.card.dark h1, .card.dark h2, .card.dark h3 { color: #f9f9f9; text-shadow: none; }
+.loading { font-weight: bold; font-size: 1.2rem; color: #888; }
+.error { color: red; font-weight: bold; }
 </style>
