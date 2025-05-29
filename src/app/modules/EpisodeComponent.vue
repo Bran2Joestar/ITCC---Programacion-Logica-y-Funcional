@@ -9,7 +9,11 @@
       <p><strong>Episodio:</strong> {{ episode.episode }}</p>
       <p><strong>Fecha de emisión:</strong> {{ episode.air_date }}</p>
       <p><strong>Descripción:</strong> {{ episode.description || '?' }}</p>
-      <img :src="episode.thumbnail_url" alt="Thumbnail del episodio" class="thumbnail" />
+      <img
+        :src="getFixedImageUrl(episode.thumbnail_url)"
+        alt="Thumbnail del episodio"
+        class="thumbnail"
+      />
       <p>
         <a :href="episode.wiki_url" target="_blank" rel="noopener noreferrer">Ver en Wiki</a>
       </p>
@@ -89,6 +93,11 @@ export default {
       if (!url) return '';
       return url.split('/').filter(Boolean).pop();
     },
+    getFixedImageUrl(url) {
+      if (!url || typeof url !== 'string') return '';
+      const match = url.match(/^(https?:\/\/.*?\.(jpg|jpeg|png|gif|webp|svg))/i);
+      return match ? match[1] : url;
+    },
     detectDarkMode() {
       this.isDarkMode = document.body.classList.contains('dark-mode');
     }
@@ -116,7 +125,6 @@ export default {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Estilo para modo oscuro activado */
 .card.dark {
   background-color: rgba(0, 0, 0, 0.85);
   color: white;
@@ -151,7 +159,6 @@ a:hover {
   border-radius: 4px;
 }
 
-/* En modo oscuro */
 .card.dark a {
   color: #fca311;
 }
